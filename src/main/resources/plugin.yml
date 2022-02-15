@@ -1,0 +1,3 @@
+name: NAuth
+version: '${project.version}'
+main: org.novau233.nauth.Main
