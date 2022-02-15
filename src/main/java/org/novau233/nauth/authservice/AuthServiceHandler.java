@@ -10,10 +10,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
+import org.novau233.nauth.Utils;
 import org.novau233.nauth.authservice.messages.client.ClientListMessage;
 import org.novau233.nauth.authservice.messages.client.IClientMessage;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
@@ -49,8 +51,27 @@ public class AuthServiceHandler extends SimpleChannelInboundHandler<IClientMessa
                 switch (tag){
                     case "LOGIN":
                         //登录消息，文件校验还在写。。。
-                        passed.put(channelHandlerContext.channel(),message.getMessage().get(1));
-                        Bukkit.getLogger().info("Channel passed!Player:" + message.getMessage().get(1));
+                        boolean passedB = false;
+                        for(int i=2;i<message.getMessage().size();i++){
+                            String md5 = message.getMessage().get(i);
+                            List<String> serMd5s = Utils.config.getStringList("Md5s");
+                            if(!md5.equals(serMd5s.get(i-2))){
+                                System.out.println("UnPassed md5:"+md5);
+                                System.out.println(serMd5s.get(i-2));
+                                passedB = false;
+                                break;
+                            }else{
+                                passedB = true;
+                            }
+
+                        }
+                        if(passedB){
+                            passed.put(channelHandlerContext.channel(),message.getMessage().get(1));
+                            Bukkit.getLogger().info("Channel passed!Player:" + message.getMessage().get(1));
+                        }else{
+                            channels.remove(channelHandlerContext.channel());
+                            channelHandlerContext.disconnect();
+                        }
                         break;
                     case "KEEPALIVE":
                         //检查是不是大量发送保活包或者初次发包

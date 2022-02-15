@@ -9,14 +9,17 @@ public final class Main extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        // Plugin startup logic
-        Start.start();
-        Bukkit.getPluginManager().registerEvents(new AuthServiceHandler(),this);
+        try {
+            this.saveDefaultConfig();
+            Thread.sleep(3000);
+            Utils.config = this.getConfig();
+            Start.start();
+            Bukkit.getPluginManager().registerEvents(new AuthServiceHandler(), this);
+        }catch (Exception e){e.printStackTrace();}
     }
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
         Start.stop();
     }
 }
